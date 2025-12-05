@@ -7,11 +7,13 @@ import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.cells.CellState;
 import appeng.api.storage.cells.StorageCell;
-import com.linearpast.ae2allinone.item.TestItem;
+import com.linearpast.ae2allinone.item.AllItemCell;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.GameMasterBlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.LinkedHashSet;
@@ -29,7 +31,7 @@ public class AIOStorageCell implements StorageCell {
     public static AIOStorageCell createInventory(ItemStack o) {
         Objects.requireNonNull(o, "Cannot create cell inventory for null itemstack");
 
-        if (!(o.getItem() instanceof TestItem)) {
+        if (!(o.getItem() instanceof AllItemCell)) {
             return null;
         }
 
@@ -60,6 +62,12 @@ public class AIOStorageCell implements StorageCell {
         items.clear();
         ForgeRegistries.ITEMS.getValues().forEach(item -> {
             try {
+                if (item instanceof SpawnEggItem) {
+                    return;
+                }
+                if (item instanceof GameMasterBlockItem) {
+                    return;
+                }
                 ItemStack stack = item.getDefaultInstance();
                 items.add(stack);
             } catch (Exception ignored) {}

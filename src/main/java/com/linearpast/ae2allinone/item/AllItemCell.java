@@ -14,8 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class TestItem extends AEBaseItem implements ICellWorkbenchItem {
-    public TestItem(Properties properties) {
+public class AllItemCell extends AEBaseItem implements ICellWorkbenchItem {
+    public AllItemCell(Properties properties) {
         super(properties);
     }
 

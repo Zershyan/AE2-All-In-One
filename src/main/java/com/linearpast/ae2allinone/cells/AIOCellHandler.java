@@ -20,7 +20,7 @@ package com.linearpast.ae2allinone.cells;
 
 import appeng.api.storage.cells.ICellHandler;
 import appeng.api.storage.cells.ISaveProvider;
-import com.linearpast.ae2allinone.item.TestItem;
+import com.linearpast.ae2allinone.item.AllItemCell;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -34,7 +34,7 @@ public class AIOCellHandler implements ICellHandler {
 
     @Override
     public boolean isCell(ItemStack is) {
-        return is != null && is.getItem() instanceof TestItem;
+        return is != null && is.getItem() instanceof AllItemCell;
     }
 
     @Override
