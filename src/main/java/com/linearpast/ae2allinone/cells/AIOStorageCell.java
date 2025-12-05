@@ -7,6 +7,7 @@ import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.cells.CellState;
 import appeng.api.storage.cells.StorageCell;
+import com.linearpast.ae2allinone.item.AllFluidCell;
 import com.linearpast.ae2allinone.item.AllItemCell;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
@@ -62,15 +63,13 @@ public class AIOStorageCell implements StorageCell {
         items.clear();
         ForgeRegistries.ITEMS.getValues().forEach(item -> {
             try {
-                if (item instanceof SpawnEggItem) {
-                    return;
-                }
-                if (item instanceof GameMasterBlockItem) {
-                    return;
-                }
+                assert !(item instanceof GameMasterBlockItem);
+                assert !(item instanceof AllItemCell);
+                assert !(item instanceof AllFluidCell);
+                assert !(item instanceof SpawnEggItem);
                 ItemStack stack = item.getDefaultInstance();
                 items.add(stack);
-            } catch (Exception ignored) {}
+            } catch (Exception | AssertionError ignored) {}
         });
     }
 
