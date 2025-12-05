@@ -45,6 +45,6 @@ public class AIOCellHandler implements ICellHandler {
     public void addCellInformationToTooltip(ItemStack is, List<Component> lines) {
         var handler = getCellInventory(is, null);
         if (handler == null) return;
-        lines.add(Component.literal("Infinite"));
+        lines.add(Component.translatable("tooltip.ae2allinone.all_item_cell"));
     }
 }
