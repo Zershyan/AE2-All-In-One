@@ -1,5 +1,7 @@
 {
   "itemGroup.ae2allinone": "AE2 全物品原件",
   "item.ae2allinone.all_item_cell": "全物品原件",
-  "tooltip.ae2allinone.all_item_cell": "\u00a75\u00a7o...满足你的一切幻想..."
+  "item.ae2allinone.all_fluid_cell": "全流体原件",
+  "tooltip.ae2allinone.all_item_cell": "\u00a75\u00a7o...满足你的一切幻想...",
+  "tooltip.ae2allinone.all_fluid_cell": "\u00a7b\u00a7o...无尽可能的海洋..."
 }

@@ -1,5 +1,6 @@
 package com.linearpast.ae2allinone;
 
+import com.linearpast.ae2allinone.item.AllFluidCell;
 import com.linearpast.ae2allinone.item.AllItemCell;
 import com.linearpast.ae2allinone.registry.CommonEvents;
 import net.minecraft.core.registries.Registries;
@@ -19,9 +20,13 @@ import net.minecraftforge.registries.RegistryObject;
 @Mod(Ae2AllInOne.MODID)
 public class Ae2AllInOne {
     public static final String MODID = "ae2allinone";
+
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     public static final RegistryObject<Item> ALL_ITEM_CELL = ITEMS.register("all_item_cell", () ->
             new AllItemCell(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> ALL_FLUID_CELL = ITEMS.register("all_fluid_cell", () ->
+            new AllFluidCell(new Item.Properties().stacksTo(1)));
+
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     public static final RegistryObject<CreativeModeTab> AE2_ALL_IN_ONE_TAB = CREATIVE_MODE_TABS.register("ae2allinone_tab",
@@ -30,6 +35,7 @@ public class Ae2AllInOne {
                     .icon(() -> new ItemStack(ALL_ITEM_CELL.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(ALL_ITEM_CELL.get());
+                        output.accept(ALL_FLUID_CELL.get());
                     })
                     .build());
 
