@@ -9,13 +9,13 @@ import appeng.api.storage.cells.StorageCell;
 import com.linearpast.ae2allinone.compat.mekanism.item.AllChemicalCell;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import me.ramidzkh.mekae2.ae2.MekanismKey;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.api.chemical.pigment.PigmentStack;
 import mekanism.api.chemical.slurry.SlurryStack;
-import me.ramidzkh.mekae2.ae2.MekanismKey;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
