@@ -1,0 +1,117 @@
+package com.lirxowo.ae2allinone.compat.mekanism.cells;
+
+import appeng.api.config.Actionable;
+import appeng.api.networking.security.IActionSource;
+import appeng.api.stacks.AEKey;
+import appeng.api.stacks.KeyCounter;
+import appeng.api.storage.cells.CellState;
+import appeng.api.storage.cells.StorageCell;
+import com.lirxowo.ae2allinone.compat.mekanism.item.AllChemicalCell;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import me.ramidzkh.mekae2.ae2.MekanismKey;
+import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.ChemicalStack;
+import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class AllChemicalStorageCell implements StorageCell {
+    private static final List<ChemicalStack> chemicals = new ArrayList<>();
+    private Object2LongMap<AEKey> storedAmounts;
+
+    public AllChemicalStorageCell() {
+    }
+
+    @Nullable
+    public static AllChemicalStorageCell createInventory(ItemStack o) {
+        Objects.requireNonNull(o, "Cannot create cell inventory for null itemstack");
+
+        if (!(o.getItem() instanceof AllChemicalCell)) {
+            return null;
+        }
+
+        return new AllChemicalStorageCell();
+    }
+
+    @Override
+    public CellState getStatus() {
+        return CellState.FULL;
+    }
+
+    @Override
+    public double getIdleDrain() {
+        return 0;
+    }
+
+    @Override
+    public void persist() {
+    }
+
+    @Override
+    public Component getDescription() {
+        return Component.empty();
+    }
+
+    public static void loadAllChemicals() {
+        chemicals.clear();
+        try {
+            MekanismAPI.CHEMICAL_REGISTRY.holders().forEach(holder -> {
+                try {
+                    if (!holder.is(MekanismAPI.EMPTY_CHEMICAL_KEY)) {
+                        chemicals.add(new ChemicalStack(holder, 1));
+                    }
+                } catch (Exception ignored) {}
+            });
+        } catch (Exception ignored) {}
+    }
+
+    private void loadCellChemicals() {
+        chemicals.forEach(chemicalStack -> {
+            try {
+                AEKey key = MekanismKey.of(chemicalStack);
+                if (key != null) {
+                    storedAmounts.put(key, Integer.MAX_VALUE * 1000L);
+                }
+            } catch (Exception ignored) {}
+        });
+    }
+
+    protected Object2LongMap<AEKey> getCellChemicals() {
+        if (this.storedAmounts == null) {
+            this.storedAmounts = new Object2LongOpenHashMap<>();
+            this.loadCellChemicals();
+        }
+
+        return this.storedAmounts;
+    }
+
+    @Override
+    public void getAvailableStacks(KeyCounter out) {
+        for (var entry : this.getCellChemicals().object2LongEntrySet()) {
+            try {
+                out.add(entry.getKey(), entry.getLongValue());
+            } catch (Exception ignored) {}
+        }
+    }
+
+    @Override
+    public long extract(AEKey what, long amount, Actionable mode, IActionSource source) {
+        return amount;
+    }
+
+    @Override
+    public long insert(AEKey what, long amount, Actionable mode, IActionSource source) {
+        return 0;
+    }
+
+    @Override
+    public boolean isPreferredStorageFor(AEKey what, IActionSource source) {
+        return false;
+    }
+}
