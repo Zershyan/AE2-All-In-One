@@ -8,9 +8,6 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-/**
- * Cell handler that manages all chemical storage cells.
- */
 public class AllChemicalCellHandler implements ICellHandler {
     public static final AllChemicalCellHandler INSTANCE = new AllChemicalCellHandler();
 

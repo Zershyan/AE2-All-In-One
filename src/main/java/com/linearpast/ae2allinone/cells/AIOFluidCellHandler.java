@@ -8,9 +8,6 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-/**
- * Cell handler that manages all fluid storage cells.
- */
 public class AIOFluidCellHandler implements ICellHandler {
     public static final AIOFluidCellHandler INSTANCE = new AIOFluidCellHandler();
 

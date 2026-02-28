@@ -26,9 +26,6 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-/**
- * Cell handler that manages all normal storage cells (items, fluids).
- */
 public class AIOCellHandler implements ICellHandler {
     public static final AIOCellHandler INSTANCE = new AIOCellHandler();
 

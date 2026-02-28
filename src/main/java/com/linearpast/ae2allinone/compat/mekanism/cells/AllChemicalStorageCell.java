@@ -20,11 +20,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class AllChemicalStorageCell implements StorageCell {
-    private static final List<ChemicalStack<?>> chemicals = new ArrayList<>();
+    private static final Supplier<Collection<ChemicalStack<?>>> CHEMICALS_SUPPLIER = createChemicalsSupplier();
     private Object2LongMap<AEKey> storedAmounts;
 
     public AllChemicalStorageCell() {
@@ -59,8 +61,22 @@ public class AllChemicalStorageCell implements StorageCell {
         return Component.empty();
     }
 
-    public static void loadAllChemicals() {
-        chemicals.clear();
+    private static Supplier<Collection<ChemicalStack<?>>> createChemicalsSupplier() {
+        return new Supplier<Collection<ChemicalStack<?>>>() {
+            private Collection<ChemicalStack<?>> cached;
+
+            @Override
+            public Collection<ChemicalStack<?>> get() {
+                if (cached == null) {
+                    cached = loadAllChemicals();
+                }
+                return cached;
+            }
+        };
+    }
+
+    private static Collection<ChemicalStack<?>> loadAllChemicals() {
+        List<ChemicalStack<?>> chemicals = new ArrayList<>();
         try {
             MekanismAPI.gasRegistry().getValues().forEach(gas -> {
                 try {
@@ -92,10 +108,11 @@ public class AllChemicalStorageCell implements StorageCell {
                 } catch (Exception ignored) {}
             });
         } catch (Exception ignored) {}
+        return chemicals;
     }
 
     private void loadCellChemicals() {
-        chemicals.forEach(chemicalStack -> {
+        CHEMICALS_SUPPLIER.get().forEach(chemicalStack -> {
             try {
                 AEKey key = MekanismKey.of(chemicalStack);
                 if (key != null) {
