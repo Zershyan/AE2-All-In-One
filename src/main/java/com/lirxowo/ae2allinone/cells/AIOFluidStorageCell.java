@@ -17,12 +17,14 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class AIOFluidStorageCell implements StorageCell {
-    private static final Set<Fluid> fluids = new LinkedHashSet<>();
+    private static final Supplier<Collection<Fluid>> FLUIDS_SUPPLIER = createFluidsSupplier();
     private Object2LongMap<AEKey> storedAmounts;
 
     public AIOFluidStorageCell() {
@@ -58,8 +60,22 @@ public class AIOFluidStorageCell implements StorageCell {
         return Component.empty();
     }
 
-    public static void loadAllFluids() {
-        fluids.clear();
+    private static Supplier<Collection<Fluid>> createFluidsSupplier() {
+        return new Supplier<Collection<Fluid>>() {
+            private Collection<Fluid> cached;
+
+            @Override
+            public Collection<Fluid> get() {
+                if (cached == null) {
+                    cached = loadAllFluids();
+                }
+                return cached;
+            }
+        };
+    }
+
+    private static Collection<Fluid> loadAllFluids() {
+        Set<Fluid> fluids = new LinkedHashSet<>();
         BuiltInRegistries.FLUID.forEach(fluid -> {
             try {
                 if (fluid == Fluids.EMPTY) {
@@ -70,10 +86,11 @@ public class AIOFluidStorageCell implements StorageCell {
                 }
             } catch (Exception ignored) {}
         });
+        return fluids;
     }
 
     private void loadCellFluids() {
-        fluids.forEach(fluid -> {
+        FLUIDS_SUPPLIER.get().forEach(fluid -> {
             AEFluidKey aeFluidKey = AEFluidKey.of(fluid);
             if (aeFluidKey != null) {
                 storedAmounts.put(aeFluidKey, Integer.MAX_VALUE * 1000L);

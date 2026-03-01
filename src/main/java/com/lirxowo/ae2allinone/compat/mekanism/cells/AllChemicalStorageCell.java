@@ -12,17 +12,18 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import me.ramidzkh.mekae2.ae2.MekanismKey;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalStack;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public class AllChemicalStorageCell implements StorageCell {
-    private static final List<ChemicalStack> chemicals = new ArrayList<>();
+    private static final Supplier<Collection<ChemicalStack>> CHEMICALS_SUPPLIER = createChemicalsSupplier();
     private Object2LongMap<AEKey> storedAmounts;
 
     public AllChemicalStorageCell() {
@@ -58,8 +59,22 @@ public class AllChemicalStorageCell implements StorageCell {
         return Component.empty();
     }
 
-    public static void loadAllChemicals() {
-        chemicals.clear();
+    private static Supplier<Collection<ChemicalStack>> createChemicalsSupplier() {
+        return new Supplier<Collection<ChemicalStack>>() {
+            private Collection<ChemicalStack> cached;
+
+            @Override
+            public Collection<ChemicalStack> get() {
+                if (cached == null) {
+                    cached = loadAllChemicals();
+                }
+                return cached;
+            }
+        };
+    }
+
+    public static Collection<ChemicalStack> loadAllChemicals() {
+        List<ChemicalStack> chemicals = new ArrayList<>();
         try {
             MekanismAPI.CHEMICAL_REGISTRY.holders().forEach(holder -> {
                 try {
@@ -69,10 +84,11 @@ public class AllChemicalStorageCell implements StorageCell {
                 } catch (Exception ignored) {}
             });
         } catch (Exception ignored) {}
+        return chemicals;
     }
 
     private void loadCellChemicals() {
-        chemicals.forEach(chemicalStack -> {
+        CHEMICALS_SUPPLIER.get().forEach(chemicalStack -> {
             try {
                 AEKey key = MekanismKey.of(chemicalStack);
                 if (key != null) {

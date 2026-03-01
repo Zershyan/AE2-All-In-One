@@ -18,12 +18,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 
 public class AIOStorageCell implements StorageCell {
-    private static final Set<ItemStack> items = new LinkedHashSet<>();
+    private static final Supplier<Collection<ItemStack>> ITEMS_SUPPLIER = createItemsSupplier();
     private Object2LongMap<AEKey> storedAmounts;
 
     public AIOStorageCell() {
@@ -59,8 +61,22 @@ public class AIOStorageCell implements StorageCell {
         return Component.empty();
     }
 
-    public static void loadAllItems() {
-        items.clear();
+    private static Supplier<Collection<ItemStack>> createItemsSupplier() {
+        return new Supplier<Collection<ItemStack>>() {
+            private Collection<ItemStack> cached;
+
+            @Override
+            public Collection<ItemStack> get() {
+                if (cached == null) {
+                    cached = loadAllItems();
+                }
+                return cached;
+            }
+        };
+    }
+
+    private static Collection<ItemStack> loadAllItems() {
+        Set<ItemStack> items = new LinkedHashSet<>();
         BuiltInRegistries.ITEM.forEach(item -> {
             try {
                 if (item instanceof GameMasterBlockItem) return;
@@ -71,10 +87,11 @@ public class AIOStorageCell implements StorageCell {
                 items.add(stack);
             } catch (Exception ignored) {}
         });
+        return items;
     }
 
     private void loadCellItems() {
-        items.stream().map(AEItemKey::of).forEach(aeItemKey -> {
+        ITEMS_SUPPLIER.get().stream().map(AEItemKey::of).forEach(aeItemKey -> {
             if (aeItemKey != null) {
                 storedAmounts.put(aeItemKey, Integer.MAX_VALUE);
             }
