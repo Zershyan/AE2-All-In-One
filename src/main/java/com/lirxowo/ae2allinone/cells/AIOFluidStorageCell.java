@@ -7,11 +7,14 @@ import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.cells.CellState;
 import appeng.api.storage.cells.StorageCell;
+import com.lirxowo.ae2allinone.config.AIOConfig;
 import com.lirxowo.ae2allinone.item.AllFluidCell;
+import com.lirxowo.ae2allinone.util.BlacklistMatcher;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -75,15 +78,20 @@ public class AIOFluidStorageCell implements StorageCell {
     }
 
     private static Collection<Fluid> loadAllFluids() {
+        BlacklistMatcher blacklist = BlacklistMatcher.of(AIOConfig.FLUID_BLACKLIST.get());
         Set<Fluid> fluids = new LinkedHashSet<>();
         BuiltInRegistries.FLUID.forEach(fluid -> {
             try {
                 if (fluid == Fluids.EMPTY) {
                     return;
                 }
-                if (fluid.isSource(fluid.defaultFluidState())) {
-                    fluids.add(fluid);
+                if (!fluid.isSource(fluid.defaultFluidState())) {
+                    return;
                 }
+                ResourceLocation id = BuiltInRegistries.FLUID.getKey(fluid);
+                if (blacklist.isBlacklisted(id)) return;
+                if (blacklist.hasTags() && blacklist.isTaggedBlacklisted(fluid.builtInRegistryHolder().tags())) return;
+                fluids.add(fluid);
             } catch (Exception ignored) {}
         });
         return fluids;

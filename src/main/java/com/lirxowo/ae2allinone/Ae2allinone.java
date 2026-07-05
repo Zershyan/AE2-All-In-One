@@ -1,6 +1,7 @@
 package com.lirxowo.ae2allinone;
 
 import com.lirxowo.ae2allinone.compat.mekanism.MekanismItems;
+import com.lirxowo.ae2allinone.config.AIOConfig;
 import com.lirxowo.ae2allinone.item.AllFluidCell;
 import com.lirxowo.ae2allinone.item.AllItemCell;
 import com.lirxowo.ae2allinone.registry.CommonEvents;
@@ -10,7 +11,9 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -44,13 +47,15 @@ public class Ae2allinone {
                     })
                     .build());
 
-    public Ae2allinone(IEventBus modBus) {
+    public Ae2allinone(IEventBus modBus, ModContainer modContainer) {
         ITEMS.register(modBus);
         CREATIVE_MODE_TABS.register(modBus);
 
         MekanismItems.register(modBus);
 
         modBus.addListener(this::setup);
+
+        modContainer.registerConfig(ModConfig.Type.COMMON, AIOConfig.SPEC);
     }
 
     private void setup(FMLCommonSetupEvent event) {

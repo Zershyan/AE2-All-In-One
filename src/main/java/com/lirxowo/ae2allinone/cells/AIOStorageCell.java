@@ -7,12 +7,15 @@ import appeng.api.stacks.AEKey;
 import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.cells.CellState;
 import appeng.api.storage.cells.StorageCell;
+import com.lirxowo.ae2allinone.config.AIOConfig;
 import com.lirxowo.ae2allinone.item.AllFluidCell;
 import com.lirxowo.ae2allinone.item.AllItemCell;
+import com.lirxowo.ae2allinone.util.BlacklistMatcher;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.GameMasterBlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
@@ -76,6 +79,7 @@ public class AIOStorageCell implements StorageCell {
     }
 
     private static Collection<ItemStack> loadAllItems() {
+        BlacklistMatcher blacklist = BlacklistMatcher.of(AIOConfig.ITEM_BLACKLIST.get());
         Set<ItemStack> items = new LinkedHashSet<>();
         BuiltInRegistries.ITEM.forEach(item -> {
             try {
@@ -83,6 +87,9 @@ public class AIOStorageCell implements StorageCell {
                 if (item instanceof AllItemCell) return;
                 if (item instanceof AllFluidCell) return;
                 if (item instanceof SpawnEggItem) return;
+                ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+                if (blacklist.isBlacklisted(id)) return;
+                if (blacklist.hasTags() && blacklist.isTaggedBlacklisted(item.builtInRegistryHolder().tags())) return;
                 ItemStack stack = item.getDefaultInstance();
                 items.add(stack);
             } catch (Exception ignored) {}

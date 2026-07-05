@@ -7,12 +7,18 @@ import appeng.api.stacks.KeyCounter;
 import appeng.api.storage.cells.CellState;
 import appeng.api.storage.cells.StorageCell;
 import com.lirxowo.ae2allinone.compat.mekanism.item.AllChemicalCell;
+import com.lirxowo.ae2allinone.config.AIOConfig;
+import com.lirxowo.ae2allinone.util.BlacklistMatcher;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import me.ramidzkh.mekae2.ae2.MekanismKey;
 import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,17 +80,32 @@ public class AllChemicalStorageCell implements StorageCell {
     }
 
     public static Collection<ChemicalStack> loadAllChemicals() {
+        BlacklistMatcher blacklist = BlacklistMatcher.of(AIOConfig.CHEMICAL_BLACKLIST.get());
         List<ChemicalStack> chemicals = new ArrayList<>();
         try {
             MekanismAPI.CHEMICAL_REGISTRY.holders().forEach(holder -> {
                 try {
-                    if (!holder.is(MekanismAPI.EMPTY_CHEMICAL_KEY)) {
+                    if (allowed(blacklist, holder)) {
                         chemicals.add(new ChemicalStack(holder, 1));
                     }
                 } catch (Exception ignored) {}
             });
         } catch (Exception ignored) {}
         return chemicals;
+    }
+
+    private static boolean allowed(BlacklistMatcher blacklist, Holder<Chemical> holder) {
+        if (holder.is(MekanismAPI.EMPTY_CHEMICAL_KEY)) {
+            return false;
+        }
+        ResourceLocation id = holder.unwrapKey().map(ResourceKey::location).orElse(null);
+        if (blacklist.isBlacklisted(id)) {
+            return false;
+        }
+        if (blacklist.hasTags() && blacklist.isTaggedBlacklisted(holder.tags())) {
+            return false;
+        }
+        return true;
     }
 
     private void loadCellChemicals() {
