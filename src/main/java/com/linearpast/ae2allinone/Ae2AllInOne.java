@@ -1,6 +1,7 @@
 package com.linearpast.ae2allinone;
 
 import com.linearpast.ae2allinone.compat.mekanism.MekanismItems;
+import com.linearpast.ae2allinone.config.AIOConfig;
 import com.linearpast.ae2allinone.item.AllFluidCell;
 import com.linearpast.ae2allinone.item.AllItemCell;
 import com.linearpast.ae2allinone.registry.CommonEvents;
@@ -11,7 +12,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -55,5 +58,7 @@ public class Ae2AllInOne {
         MekanismItems.register(modBus);
 
         modBus.addListener(CommonEvents::setup);
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, AIOConfig.SPEC);
     }
 }
